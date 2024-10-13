@@ -1,0 +1,127 @@
+body {
+    -webkit-text-size-adjust: 100%;
+    font-family: 'GenJyuuGothicX';
+    margin-bottom: 300px;
+    }
+
+/*タイトルの書式設定*/
+.title {
+    /*文字設定*/
+	width: auto;
+    white-space: nowrap;
+	width: 335px;
+    background-color: rgb(107, 184, 0);
+    color: white;
+    font-family: 'GenJyuuGothicL';
+	font-size: xx-large;
+	margin-left: 20px;
+	margin-right: 30px;
+}
+
+/*説明文の装飾*/
+.caption {
+    white-space: nowrap;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    list-style: "＞";
+}
+.date{
+    white-space: nowrap;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    margin-left: 25px;
+}
+
+/*設定部の全体設定*/
+.settable {
+    white-space: nowrap;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+.settable th{
+    padding: 2px 20px 2px 20px;
+    background-color: peachpuff;
+    border-radius: 15px;
+    text-align: center;
+}
+
+/*計算ボタンの設定*/
+.simgo {
+    white-space: nowrap;
+    margin-top: 10px;
+	margin-left: 40px;
+}
+#startbutton{
+    font-size: 16px;
+    border: none;
+    padding: 3px 10px 3px 10px;
+    background-color: #0080ff;
+    color: white;
+}
+#startbutton:active{
+    background: #f11f1f;
+    color: white;
+}
+
+/*結果表示部の設定*/
+.tableset {
+    display: flex;
+    align-items: flex-start
+}
+
+.setreturntable{
+    overflow-x: scroll;
+    white-space: nowrap;
+    text-align: center;
+    border: 1px #666666 solid;
+    border-collapse: collapse;
+    margin-left: 20px;
+    margin-top: 40px;
+}
+.setreturntable th{
+    background: #eaecf0;
+    padding: 0px 10px 0px 10px;
+}
+.setreturntable td{
+    background-color: #f8f9fa;
+    padding: 0px 10px 0px 10px;
+}
+
+.resulttable{
+    overflow-x: scroll;
+    white-space: nowrap;
+    text-align: center;
+    border: 1px #666666 solid;
+    border-collapse: collapse;
+    margin-left: 20px;
+    margin-top: 40px;
+}
+.resulttable th{
+    background: #eaecf0;
+    padding: 0px 10px 0px 10px;
+}
+.resulttable td{
+    background-color: #f8f9fa;
+    padding: 0px 10px 0px 10px;
+}
+
+/*入力フォームのエラー設定*/
+.error {
+    display: none; 
+}
+input:invalid + .error {
+    display: block;
+    color: red;
+    font-size: 0.9em;
+}
+
+
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
