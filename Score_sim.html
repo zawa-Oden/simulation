@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <title>スコアシミュレーター</title>
+  <link rel="stylesheet" type="text/css" href="Score_sim_style.css">
+  <link href="https://shogo82148.github.io/genjyuugothic-subsets/GenJyuuGothicX-Regular/GenJyuuGothicX-Regular.css" type="text/css" rel="stylesheet">
+  <link href="https://shogo82148.github.io/genjyuugothic-subsets/GenJyuuGothicL-Bold/GenJyuuGothicL-Bold.css" type="text/css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.7, user-scalable=yes">
+  <script type="text/javascript" async src="Score_sim_rev2.js" charset="utf-8"></script>
+  <script type="text/javascript" async src="Score_sim_master.js" charset="utf-8"></script>
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/histogram-bellcurve.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+</head>
+
+<body>
+  <h1 class="title">&nbsp;スコアシミュレーター</h1>
+
+  <ul class="caption">
+     <li>&ensp;Master AP時の最終スコアを算出。250曲/250曲 計算可（期間限定含む）。</li>
+     <li>&ensp;スキル発動/未発動は乱数で決定。3.72%、3.50%の発動時間違いの裏スキル、S.tellerも考慮。</li>
+     <li>&ensp;Fleekスコアアップのシーンカードにも対応しました。←ズレがあるかもしれません、不具合あれば連絡ください。</li>
+     <li>&ensp;試行回数の上限は100000回。計算時間的に30000回〜50000回くらいがベター。</li>
+     <li>&ensp;各楽曲の詳細情報：<a href="song.html" style="color:black">楽曲一覧</a></li>
+     <li>&ensp;シーンカード情報：<a href="uniair_cardlist.html" style="color:black">シーンカード一覧</a></li>
+  </ul>
+  <p class="date"><a href="Change Log.html" style="text-decoration:none; color:black">最終更新日</a>：2024/10/26 … 「急行券とリズム (Green/Lv.21)」追加</p>
+
+  <table class="settable">
+     <tr><th>楽曲</th> <td>：</td> <td colspan="2"><select id="songselect" onchange="change()"></select></td> <td id="okngcheck"></td></tr>
+     <tr><th>フロント総合力</th> <td>：</td> <td><input type="number" value="100000" step="1" id="setFsougou" onchange="change()"></input><div class="error">0以上の数値（半角）を入力して下さい</div></td></tr>
+     <tr><th>グループ総合力</th> <td>：</td> <td><input type="number" value="1000000" step="1" id="setGsougou" onchange="change()"></input><div class="error">0以上の数値（半角）を入力して下さい</div></td></tr>
+     <tr><th>試行回数</th> <td>：</td> <td><input type="number" value="10000" step="1" min="1000" max="100000" id="setSikou" onchange="change()"></input><div class="error">1000〜100000の整数（半角）を入力して下さい</div></td></tr>
+     <tr><th rowspan="5">フロント</th> <td rowspan="5">：</td> <td style="width: 240px"><select id="setFront1" onchange="change()"></select></td> <td><select id="setBai1" onchange="change()"></select></td></tr>
+     <tr><td><select id="setFront2" onchange="change()"></select></td> <td><select id="setBai2" onchange="change()"></select></td></tr>
+     <tr><td><select id="setFront3" onchange="change()"></select></td> <td><select id="setBai3" onchange="change()"></select></td></tr>
+     <tr><td><select id="setFront4" onchange="change()"></select></td> <td><select id="setBai4" onchange="change()"></select></td></tr>
+     <tr><td><select id="setFront5" onchange="change()"></select></td> <td><select id="setBai5" onchange="change()"></select></td></tr>
+  </table>
+
+  <div class="simgo">
+     <input type="button" value="計算開始" id="startbutton" onclick="output()"></input>
+  </div>
+
+  <div style="width: 710px;" id="container"></div>
+
+  <div class="tableset">
+     <table class="setreturntable" border="1">
+        <tr><th>フロント総合力</th> <td id="setreturn1"></td></tr>
+        <tr><th>グループ総合力</th> <td id="setreturn2"></td></tr>
+        <tr><th>フロント編成</th> <td><div id="setreturn31"></div><div id="setreturn32"></div></div><div id="setreturn33"></div></div><div id="setreturn34"></div></div><div id="setreturn35"></div></td></tr>
+        <tr><th>試行回数</th> <td id="setreturn4"></td></tr>
+     </table>
+
+     <table class="resulttable" border="1">
+       <tr><th colspan="2">累積分布</th> <th>予想スコア</th></tr>
+       <tr><td>MIN</td> <td>-</td> <td id="result0"></td></tr>
+       <tr><td>-3σ</td> <td>0.13%</td> <td id="result1"></td></tr>
+       <tr><td>-2σ</td> <td>2.28%</td> <td id="result2"></td></tr>
+       <tr><td>-σ</td> <td>15.87%</td> <td id="result3"></td></tr>
+       <tr><td>0</td> <td>50.00%</td> <td id="result4"></td></tr>
+       <tr><td>σ</td> <td>84.13%</td> <td id="result5"></td></tr>
+       <tr><td>2σ</td> <td>97.72%</td> <td id="result6"></td></tr>
+       <tr><td>3σ</td> <td>99.87%</td> <td id="result7"></td></tr>
+       <tr><td>MAX</td> <td>-</td> <td id="result8"></td></tr>
+     </table>
+  </div>
+
+  <script>
+   let btn = document.querySelector('#startbutton');
+   btn.addEventListener('click', function () {
+      Highcharts.chart('container', {
+         chart: {
+            type: 'column',
+         },
+         title: {
+            text: song[document.getElementById("songselect").value],
+         },
+         xAxis: {
+            min: sigmaresult[0]-50000,
+            max: sigmaresult[parseInt(scoresimloop)-1]+50000,                
+            title: {
+               text: 'x',
+            },
+            plotLines:[
+            {
+               color: '#FF0000',
+               dashStyle: 'Dot',
+               width: 1,         
+               value: sigma[0],
+               label: {     
+                  text: "-3σ"
+               },    
+            },
+            { 
+               color: '#FF0000',
+               dashStyle: 'ShortDash',
+               width: 1,
+               value: sigma[1],
+               label: {
+                  text: "-2σ"
+               },
+            },
+            {
+               color: '#FF0000',
+               dashStyle: 'Dash',
+               width: 1,
+               value: sigma[2],
+               label: {
+                  text: "-σ"
+               },
+            },
+            {
+               color: '#FF0000',
+               dashStyle: 'Solid',
+               width: 1,
+               value: sigma[3],
+               label: {
+                  text: "0"
+               },
+            },
+            {
+               color: '#FF0000',
+               dashStyle: 'Dash',
+               width: 1,
+               value: sigma[4],
+               label: {
+                  text: "σ"
+               },
+            },
+            {
+               color: '#FF0000',
+               dashStyle: 'ShortDash',
+               width: 1,
+               value: sigma[5],
+               label: {
+                  text: "2σ"
+               },
+            },
+            {
+               color: '#FF0000',
+               dashStyle: 'Dot',
+               width: 1,
+               value: sigma[6],
+               label: {
+                  text: "3σ"
+               },
+            },
+         ]
+         },
+         yAxis: {
+            min: 0,
+            title: {
+               text: 'P(X=x)',
+            }
+         },
+         tooltip: {
+            headerFormat: '<table width=120><tr><td>x= <span style="color:#33f;">{point.key:.0f}</span></td></tr>',
+            pointFormat: '<tr><td style="padding:0;text-align:center;"><b style="font-size:18px">{point.px:.2f}%</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+         },
+         plotOptions: {
+            column: {
+               pointPadding: 0,
+               borderWidth: 0,
+               groupPadding: 0,
+               shadow: false,
+            },
+         },
+         series: [{
+            type: 'column',
+            turboThreshold: 0,
+            showInLegend: false,
+            name: 'data',
+            data: Graphdata,
+            pointStart: 0,
+         }]
+      });
+   });
+  </script>
+</body>
+
+</html>
